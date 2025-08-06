@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CodeDAO Wallet</title>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+  <script defer src="wallet-claim.js"></script>
+</head>
+<body>
+  <header class="navbar">
+    <h1>💸 CodeDAO Wallet Dashboard</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="dashboard.html">Live Dashboard</a>
+      <a href="wallet-dashboard.html" class="active">Wallet</a>
+      <a href="peer-review.html">Peer Review</a>
+      <a href="https://github.com/CodeDAO-org/codedao-extension" target="_blank">GitHub</a>
+    </nav>
+  </header>
+
+  <main class="dashboard">
+    <section class="wallet-section">
+      <h2>Your CODE Wallet</h2>
+      <button id="connect-wallet">🔗 Connect Wallet</button>
+      <p id="wallet-address">Wallet not connected</p>
+
+      <div class="balance-box">
+        <h3>CODE Balance</h3>
+        <p id="code-balance">0.00 CODE</p>
+        <button id="claim-rewards" disabled>🎁 Claim Rewards</button>
+        <p id="claim-status"></p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 CodeDAO. All rights reserved.</p>
+  </footer>
+</body>
+</html>
