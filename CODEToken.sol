@@ -30,21 +30,64 @@ abstract contract Context {
 }
 
 /**
- * @dev Implementation of the {IERC20} interface.
+ * @dev Contract module which provides a basic access control mechanism, where
+ * there is an account (an owner) that can be granted exclusive access to
+ * specific functions.
  */
-contract CODEToken is Context, IERC20 {
+abstract contract Ownable is Context {
+    address private _owner;
+
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+
+    constructor() {
+        _transferOwnership(_msgSender());
+    }
+
+    function owner() public view virtual returns (address) {
+        return _owner;
+    }
+
+    modifier onlyOwner() {
+        require(owner() == _msgSender(), "Ownable: caller is not the owner");
+        _;
+    }
+
+    function renounceOwnership() public virtual onlyOwner {
+        _transferOwnership(address(0));
+    }
+
+    function transferOwnership(address newOwner) public virtual onlyOwner {
+        require(newOwner != address(0), "Ownable: new owner is the zero address");
+        _transferOwnership(newOwner);
+    }
+
+    function _transferOwnership(address newOwner) internal virtual {
+        address oldOwner = _owner;
+        _owner = newOwner;
+        emit OwnershipTransferred(oldOwner, newOwner);
+    }
+}
+
+/**
+ * @dev Implementation of the {IERC20} interface with CodeDAO reward system.
+ */
+contract CODEToken is Context, IERC20, Ownable {
     mapping(address => uint256) private _balances;
     mapping(address => mapping(address => uint256)) private _allowances;
+    mapping(address => uint256) public pendingRewards;
 
     uint256 private _totalSupply;
 
     string private _name;
     string private _symbol;
 
+    event RewardAdded(address indexed user, uint256 amount);
+    event RewardClaimed(address indexed user, uint256 amount);
+
     constructor(string memory name_, string memory symbol_) {
         _name = name_;
         _symbol = symbol_;
-        _mint(_msgSender(), 1000000 * 10 ** decimals()); // optional initial supply
+        _mint(_msgSender(), 1000000 * 10 ** decimals()); // Initial supply for owner
     }
 
     function name() public view virtual returns (string memory) {
@@ -88,6 +131,78 @@ contract CODEToken is Context, IERC20 {
         _spendAllowance(from, spender, amount);
         _transfer(from, to, amount);
         return true;
+    }
+
+    /**
+     * @dev Add rewards for a user (only owner can call this)
+     * @param user Address of the user to reward
+     * @param amount Amount of tokens to add as pending rewards
+     */
+    function addReward(address user, uint256 amount) external onlyOwner {
+        require(user != address(0), "Cannot reward zero address");
+        require(amount > 0, "Reward amount must be greater than 0");
+        
+        pendingRewards[user] += amount;
+        emit RewardAdded(user, amount);
+    }
+
+    /**
+     * @dev Add rewards for multiple users (batch operation)
+     * @param users Array of user addresses
+     * @param amounts Array of reward amounts
+     */
+    function addRewardsBatch(address[] calldata users, uint256[] calldata amounts) external onlyOwner {
+        require(users.length == amounts.length, "Arrays length mismatch");
+        
+        for (uint256 i = 0; i < users.length; i++) {
+            require(users[i] != address(0), "Cannot reward zero address");
+            require(amounts[i] > 0, "Reward amount must be greater than 0");
+            
+            pendingRewards[users[i]] += amounts[i];
+            emit RewardAdded(users[i], amounts[i]);
+        }
+    }
+
+    /**
+     * @dev Claim pending rewards (mints new tokens to user)
+     */
+    function claim() external {
+        uint256 reward = pendingRewards[_msgSender()];
+        require(reward > 0, "No rewards to claim");
+        
+        pendingRewards[_msgSender()] = 0;
+        _mint(_msgSender(), reward);
+        
+        emit RewardClaimed(_msgSender(), reward);
+    }
+
+    /**
+     * @dev Claim specific amount of pending rewards
+     * @param amount Amount to claim (must be <= pending rewards)
+     */
+    function claim(uint256 amount) external {
+        require(amount > 0, "Claim amount must be greater than 0");
+        require(pendingRewards[_msgSender()] >= amount, "Insufficient pending rewards");
+        
+        pendingRewards[_msgSender()] -= amount;
+        _mint(_msgSender(), amount);
+        
+        emit RewardClaimed(_msgSender(), amount);
+    }
+
+    /**
+     * @dev Check pending rewards for an address
+     * @param user Address to check
+     */
+    function getPendingRewards(address user) external view returns (uint256) {
+        return pendingRewards[user];
+    }
+
+    /**
+     * @dev Emergency function to withdraw any ETH sent to contract
+     */
+    function withdrawETH() external onlyOwner {
+        payable(owner()).transfer(address(this).balance);
     }
 
     function _transfer(address from, address to, uint256 amount) internal virtual {
