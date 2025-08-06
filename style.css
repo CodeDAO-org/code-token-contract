@@ -1,0 +1,86 @@
+body {
+  font-family: "Segoe UI", sans-serif;
+  background-color: #0c0c0c;
+  color: #ffffff;
+  margin: 0;
+  padding: 0;
+}
+
+header.navbar {
+  background-color: #141414;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #333;
+}
+
+header.navbar h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #00f2ff;
+}
+
+header.navbar nav a {
+  color: #ccc;
+  margin-left: 1rem;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+header.navbar nav a.active,
+header.navbar nav a:hover {
+  color: #00f2ff;
+}
+
+main.dashboard {
+  padding: 2rem;
+  max-width: 800px;
+  margin: auto;
+}
+
+.wallet-section {
+  background-color: #1a1a1a;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 0 8px rgba(0, 242, 255, 0.2);
+}
+
+.wallet-section h2,
+.wallet-section h3 {
+  color: #00f2ff;
+}
+
+#connect-wallet,
+#claim-rewards {
+  background-color: #00f2ff;
+  color: #000;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+#connect-wallet:hover,
+#claim-rewards:hover {
+  background-color: #00c9d9;
+}
+
+.balance-box {
+  margin-top: 2rem;
+}
+
+#claim-status {
+  margin-top: 1rem;
+  color: #999;
+}
+
+footer {
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.875rem;
+  background-color: #141414;
+  border-top: 1px solid #333;
+}
